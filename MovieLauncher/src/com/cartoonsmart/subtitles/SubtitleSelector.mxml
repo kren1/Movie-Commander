@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+         xmlns:s="library://ns.adobe.com/flex/spark" 
+         xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300" title="Select Search parametrs" close="{PopUpManager.removePopUp(this)}" creationComplete="titlewindow1_addedToStageHandler(event)">
+  <fx:Script>
+    <![CDATA[
+      import com.cartoonsmart.Events.SubtitleWindowEvent;
+      
+      import mx.managers.PopUpManager;
+      public var fileName:String;
+      
+      
+      protected function button1_clickHandler():void
+      {
+        // TODO Auto-generated method stub
+        
+        if(nv.validate(season.text).results == null&& nv.validate(episode.text).results == null)
+        {
+          dispatchEvent(new SubtitleWindowEvent(SubtitleWindowEvent.SEARCH_SUBS,MovName.text,season.text,episode.text));
+          PopUpManager.removePopUp(this);
+        }
+
+      }
+      
+      protected function titlewindow1_addedToStageHandler(event:Event):void
+      {
+        // TODO Auto-generated method stub
+        var a:Array;
+        var r:RegExp = /S\d\dE\d\d/;
+        a =  String(fileName).match(r);
+        if(a != null)
+        {
+          season.text = String(a[0]).substr(1,2);
+          episode.text = String(a[0]).substr(4,2); 
+          a = String(fileName).split("\\");
+          MovName.text = a[a.length-1].substring(0,a[a.length-1].search(r));
+          while(MovName.text.split(".").length != 1)
+            MovName.text = MovName.text.replace("."," ");
+        }
+        else
+        {
+          r = /\dx\d\d/;
+          a =  String(fileName).match(r);
+          if(a != null)
+          {
+            season.text = String(a[0]).substr(0,1);
+            episode.text = String(a[0]).substr(2,2); 
+            a = String(fileName).split("\\");
+            MovName.text = a[a.length-1].substring(0,a[a.length-1].search(r));
+            while(MovName.text.split(".").length != 1)
+              MovName.text = MovName.text.replace("."," ");
+          }
+        }
+      }
+      
+    ]]>
+  </fx:Script>
+  <fx:Declarations>
+    <!-- Place non-visual elements (e.g., services, value objects) here -->
+
+  <mx:NumberValidator  id="nv" allowNegative="false" domain="int" integerError="enter integer" invalidCharError="invalid chars" /> 
+  </fx:Declarations>
+  <s:TextInput id="MovName" x="10" y="10"/>
+  <s:TextInput id="season" x="10" y="40"/>
+  <s:TextInput id="episode" x="10" y="70"/>
+  <s:Label x="150" y="10" height="15" text="Name"/>
+  <s:Label x="149" y="40" text="Season"/>
+  <s:Label x="151" y="70" text="Episode"/>
+  <s:Button x="10" y="128" label="Search" id="search" click="button1_clickHandler()"/>
+</s:TitleWindow>

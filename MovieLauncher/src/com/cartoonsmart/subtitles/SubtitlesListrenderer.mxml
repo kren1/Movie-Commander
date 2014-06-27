@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+                xmlns:s="library://ns.adobe.com/flex/spark" 
+                xmlns:mx="library://ns.adobe.com/flex/mx" 
+                autoDrawBackground="true" dataChange="itemrenderer1_dataChangeHandler(event)">
+  <fx:Script>
+    <![CDATA[
+      import flashx.textLayout.conversion.TextConverter;
+      
+      import mx.core.BitmapAsset;
+      import mx.events.FlexEvent;
+      [Embed(source="slike/1.gif")]
+      [Bindable]
+      private var slo:Class;
+      [Embed(source="slike/2.gif")]
+      [Bindable]
+      private var ang:Class;
+      [Embed(source="slike/36.gif")]
+      [Bindable]
+      private var ser:Class;
+      [Embed(source="slike/5.gif")]
+      [Bindable]
+      private var ger:Class;
+      [Embed(source="slike/8.gif")]
+      [Bindable]
+      private var fra:Class;
+      [Embed(source="slike/9.gif")]
+      [Bindable]
+      private var ita:Class;
+      [Embed(source="slike/38.gif")]
+      [Bindable]
+      private var hr:Class;
+      [Embed(source="slike/28.gif")]
+      [Bindable]
+      private var spa:Class;
+      [Embed(source="slike/27.gif")]
+      [Bindable]
+      private var ru:Class;
+      [Embed(source="slike/17.gif")]
+      [Bindable]
+      private var chi:Class;
+      [Embed(source="slike/4.gif")]
+      [Bindable]
+      private var kor:Class;
+      [Embed(source="slike/23.gif")]
+      [Bindable]
+      private var ned:Class;
+      [Embed(source="slike/16.gif")]
+      [Bindable]
+      private var gre:Class;
+      
+      
+      protected function itemrenderer1_dataChangeHandler(event:FlexEvent):void
+      {
+        
+        var s:String;
+        if(data.tvSeason != null && data.tvEpisode != "")
+          s = " season:<b>" + data.tvSeason + "</b>  episode:<b>" + data.tvEpisode + "</b>";
+        title.textFlow = TextConverter.importToFlow(data.title + " <b>(" + data.year + ")</b> " + s,TextConverter.TEXT_FIELD_HTML_FORMAT);
+        release.text = data.release;
+        
+        var img:BitmapAsset;
+        
+        naglusn.visible = false;
+        
+        switch(data.languageId.toString())
+        {
+          case "1":img = new slo()  as BitmapAsset;data.chrSet = "x-Europa";break;
+          case "2":img = new ang()  as BitmapAsset;data.chrSet = "x-Europa";break;
+          case "36":img = new ser() as BitmapAsset;data.chrSet = "x-Europa";break;
+          case "5":img = new ger()  as BitmapAsset;data.chrSet = "x-Europa";break;
+          case "8":img = new fra()  as BitmapAsset;data.chrSet = "x-Europa";break;
+          case "9":img = new ita()  as BitmapAsset;data.chrSet = "x-Europa";break;
+          case "38":img = new hr()  as BitmapAsset;data.chrSet = "x-Europa";break;
+          case "28":img = new spa() as BitmapAsset;data.chrSet = "x-Europa";break;
+          case "27":img = new ru()  as BitmapAsset;data.chrSet = "iso-8859-5";break;
+          case "17":img = new chi() as BitmapAsset;data.chrSet = "big5";break;
+          case "4":img = new kor()  as BitmapAsset;data.chrSet = "ks_c_5601-1987";break;
+          case "23":img = new ned() as BitmapAsset;data.chrSet = "x-Europa";break;
+          case "16":img = new gre() as BitmapAsset;data.chrSet = "x-Europa";break;
+        }
+        slika.source = img;
+       
+        
+        // flag naglush h
+        if(data.flags ==  "h")
+        {
+          naglusn.visible = true;
+        }
+      }
+      
+    ]]>
+  </fx:Script>
+  <s:Image left="5" top="10" width="25" height="12" id="slika"/>
+  <s:Image left="5" top="30" source="@Embed('slike/n.png')" id="naglusn"/>
+  <s:RichText left="38" top="10" fontFamily="Arial" fontSize="16" text="Label" textAlign="left" id="title" />
+  <s:RichText left="38" top="36" fontSize="10" fontStyle="italic" text="Label" textAlign="left" id="release" verticalAlign="top"/>
+  
+  
+  
+</s:ItemRenderer>

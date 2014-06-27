@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+        xmlns:s="library://ns.adobe.com/flex/spark"  title="{data.title}" backgroundColor="0x666666">
+  <fx:Declarations>
+    <!-- Place non-visual elements (e.g., services, value objects) here -->
+  </fx:Declarations>
+  <s:TextArea left="10" right="10" top="10" bottom="10" color="#FFFFFF"
+              contentBackgroundColor="0x777777" editable="false" text="{data.text}" lineBreak="{data.lb}"/>
+  <s:actionContent>
+    <s:Button label="{resourceManager.getString('resources','BACK_BTN')}" click="{navigator.popView()}"/>
+  </s:actionContent>
+</s:View>

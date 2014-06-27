@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fxpProperties abbreviated="false" authoringTool="Flex Builder" compiles="true" parentProject="2b3dc261-d3b0-40dc-a6d4-021fb7c43f80" projectUUID="2b3dc261-d3b0-40dc-a6d4-021fb7c43f80" pureCatalystProject="false" sdkVersion="4.5.1" uuid="e33652e4-c02e-47f8-9bf0-660ebab4e6e9" version="15">
+  <projects/>
+  <src>
+    <linked isMain="false" location="${DOCUMENTS}/Movie/other" path="${DOCUMENTS}/Movie/other" position="0" uuid="e33652e4-c02e-47f8-9bf0-660ebab4e6e9"/>
+  </src>
+  <swc>
+    <linked location="sdkPlaceHolder" path="sdkPlaceHolder" position="0" uuid="e33652e4-c02e-47f8-9bf0-660ebab4e6e9"/>
+    <linked location="E:/cartton-smat-tutroial/MovieApp/Testi/MovieLauncher/libs" path="/libs" position="1" uuid="97dd6cd4-93d8-497f-a923-673435f4c3bc"/>
+  </swc>
+  <misc/>
+  <theme/>
+  <mxmlFormattingPrefs groupAttributesByState="true" maxLineWidth="100" mxmlAlignAttributes="true" mxmlAttributeOrder="id,userLabel,includeIn,excludeFrom,visible,x,y,z,left,right,top,bottom,width,height,minWidth,minHeight,maxWidth,maxHeight,label" mxmlKeepAttributeValuesOrganized="true"/>
+</fxpProperties>

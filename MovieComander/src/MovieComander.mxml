@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ViewNavigatorApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+                                     xmlns:s="library://ns.adobe.com/flex/spark"  firstView="views.Options"
+                                     backgroundColor="0x333333" creationComplete="viewnavigatorapplication1_creationCompleteHandler(event)"
+                                     splashScreenImage="@Embed('slike/Wombat1.jpg')" xmlns:other="com.cartoonsmart.other.*" applicationDPI="240">
+  <fx:Script>
+    <![CDATA[
+      import air.net.URLMonitor;
+      
+      import model.AppModel;
+      
+      import mx.events.FlexEvent;
+      import mx.managers.PopUpManager;
+      
+      import slike.menu;
+      
+      import views.MovieComanderHomeView;
+      
+      private var Appmodel:AppModel = AppModel.getInstance();
+      
+      private var monitor:URLMonitor
+      
+      protected final function viewnavigatorapplication1_creationCompleteHandler(event:FlexEvent):void
+      {
+        // TODO Auto-generated method stub
+        Appmodel.nav = navigator;
+        monitor = new URLMonitor(new URLRequest("http://www.google.com"));
+        monitor.addEventListener(StatusEvent.STATUS,networkStat);
+        monitor.start();
+      }
+      private final function networkStat(e:StatusEvent):void
+      {
+        Appmodel.show(monitor.available,"NO_CONN");
+      }
+  
+    ]]>
+  </fx:Script>
+  <fx:Declarations>
+    <!-- Place non-visual elements (e.g., services, value objects) here -->
+    <other:ErrorPop id="err"/>
+  </fx:Declarations>
+  <fx:Metadata>
+    [ResourceBundle("resources")]
+  </fx:Metadata>
+  <fx:Style source="slike/stili.css"/>
+  <s:navigationContent>
+    <s:Button icon="{slike.menu}" width="90" click="{navigator.pushView(MovieComanderHomeView)}" />
+  </s:navigationContent>
+</s:ViewNavigatorApplication>

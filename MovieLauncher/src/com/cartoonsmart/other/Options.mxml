@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   width="300" height="250" enabled="true" title="Options" close="{PopUpManager.removePopUp(this)}" creationComplete="titlewindow1_addHandler(event)">
+	<s:layout>
+		<s:VerticalLayout paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10"/>
+	</s:layout> 
+  <fx:Script>
+		<![CDATA[
+			import com.cartoonsmart.Events.OptionsWindowEvent;
+			
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;			
+			
+      private var exeFilter:FileFilter = new FileFilter("Executable","*.exe");
+      
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				dispatchEvent(new OptionsWindowEvent(OptionsWindowEvent.WINDOW_CLOSED,vlc_path.text,mpc_path.text,mpcCB.selected,SubsCb.selected));
+				PopUpManager.removePopUp(this);
+			}
+
+      protected function button2_clickHandler(event:MouseEvent):void
+      {
+        var file:File = new File();
+        file.addEventListener(Event.SELECT, file_selectVLC);
+        file.browseForOpen("Please select VLC exe",[exeFilter]);   
+      }
+      private function file_selectVLC(e:Event):void
+      {
+        vlc_path.text = File(e.currentTarget).nativePath;
+      }
+      protected function button3_clickHandler(event:MouseEvent):void
+      {
+        var file:File = new File();
+        file.addEventListener(Event.SELECT, file_selectMPC);
+        file.browseForOpen("Please select MPC exe",[exeFilter]);   
+      }
+      private function file_selectMPC(e:Event):void
+      {
+        mpc_path.text= File(e.currentTarget).nativePath;
+      }
+      
+      protected function titlewindow1_addHandler(event:FlexEvent):void
+      {
+        try 
+        { 
+          start.selected = NativeApplication.nativeApplication.startAtLogin; 
+        } 
+        catch (e:Error) 
+        { 
+          start.enabled = false;
+          trace( "Cannot set startAtLogin:" + e.message ); 
+        }         
+      }
+      
+      protected function start_changeHandler(event:Event):void
+      {
+        try 
+        { 
+          NativeApplication.nativeApplication.startAtLogin = start.selected; 
+        } 
+        catch ( e:Error ) 
+        { 
+          trace( "Cannot set startAtLogin:" + e.message ); 
+        } 
+      }
+      
+    ]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:Label text="VLC Path"/>
+  <s:HGroup>
+    <s:TextInput id="vlc_path" width="100%"/>
+    <s:Button label="Browse"  click="button2_clickHandler(event)"/>
+  </s:HGroup>
+	<s:Label text="MPC Path"/>
+  <s:HGroup>
+    <s:TextInput id="mpc_path" width="100%"/>
+    <s:Button label="Browse"  click="button3_clickHandler(event)"/>
+  </s:HGroup>
+	<s:CheckBox id="mpcCB" label="Media Player Classic"/>
+  <s:CheckBox label="Subs Off or use defoult" id="SubsCb"/>
+  <s:CheckBox label="Start on Login" id="start" change="start_changeHandler(event)"/>
+	<s:Button label="Save" click="button1_clickHandler(event)"/>
+</s:TitleWindow>

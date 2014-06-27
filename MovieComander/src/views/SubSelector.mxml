@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<my:OrientationView xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark"  
+        backgroundColor="0x666666" title="{data.name}" xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:my="com.cartoonsmart.other.*"
+        dataChange="view1_dataChangeHandler(event)" creationComplete="view1_dataChangeHandler(event)">
+  <fx:Script>
+    <![CDATA[    
+      import model.AppModel;
+      
+      import mx.events.FlexEvent;
+      
+      import other.ComCommands;
+      
+      [Bindable]
+      private var appModel:AppModel = AppModel.getInstance();
+      
+      [Bindable(event="rbChange")]
+      private final function getLabel():String
+      {
+        var s:String = resourceManager.getString('resources','SEARCH');
+        if(mov != null)
+        {
+          if(mov.selected || ser.selected)
+            s = resourceManager.getString('resources','SEARCH');
+          else if(no.selected)
+            s = resourceManager.getString('resources','PLAY');
+        }        
+        return s;
+      }
+      
+      protected final function go_clickHandler(event:MouseEvent):void
+      {
+        event.stopPropagation();
+        var ba:ByteArray = new ByteArray();
+        ba.writeByte(ComCommands.SET_PLAYER);
+        ba.writeBoolean(cb.selected);
+        appModel.Send(ba);
+        
+        if(no.selected == true)
+        {
+          ba.clear();
+          ba.writeByte(ComCommands.PLAY_WITOUT_SUBS);
+          ba.writeObject({nativePath:data.nativePath});
+          appModel.Send(ba);
+          navigator.popView();
+          
+          return;
+        }
+        if(sez.errorString == "" && epiz.errorString == "")
+        {
+          ba.clear();
+          if(mov.selected || ser.selected)
+          {
+            var o:Object = new Object();
+            o.name = MovName.text;
+            o.nativePath = data.nativePath;
+            if(ser.selected)
+            {
+              o.sez = sez.text;
+              o.epiz = epiz.text;
+            }
+            ba.writeByte(ComCommands.REQUEST_SUB);
+            ba.writeObject(o);
+            appModel.Send(ba);
+            appModel.ShowBusy();
+            this.enabled = false;
+          }
+        }
+        
+        
+      }
+      
+      protected final function view1_dataChangeHandler(event:FlexEvent):void
+      {
+        event.stopPropagation();
+      
+        if(sez != null)
+        {
+          var status:int = -1;
+          var i:int = -1;
+          var a:Array = [RegExp(/S\d\dE\d\d/i),RegExp(/\d\dx\d\d/),RegExp(/\dx\d\d/)];
+          var a1:Array = [{a:1,b:2,c:4,d:2},{a:0,b:2,c:3,d:2},{a:0,b:1,c:2,d:2}];
+          while(status != 1)
+          {
+            status = compare(a[i],a1[i]);
+            if(i+1 == a.length)break;   
+            i++;
+          }
+          if(status != 1)
+          {
+            i = String(data.name).search(/\d\d\d\d/);
+            if(i != -1)
+            {
+              var s:String = String(data.name).substring(0,i);
+              while(s.split(".").length != 1)
+                s = s.replace("."," ");
+              
+              MovName.text = s;
+            }
+          }
+        } 
+        try
+        {
+          MovName.setFocus(); //1 soultion
+        }
+        catch(e:Error)
+        {
+          trace(e.message);
+        }
+        
+      }
+      private final function compare(r:RegExp,o:Object=null):int
+      {
+        var a:Array;
+        var status:int;
+        a =  String(data.nativePath).match(r);
+        if(a != null)
+        {
+          if(o != null)
+          {
+            sez.text = String(a[0]).substr(int(o.a),int(o.b));
+            epiz.text = String(a[0]).substr(int(o.c),int(o.d));  
+          }
+          a = String(data.nativePath).split("\\");
+          MovName.text = a[a.length-1].substring(0,a[a.length-1].search(r));
+          while(MovName.text.split(".").length != 1)
+            MovName.text = MovName.text.replace("."," ");
+          
+          ser.selected = true;
+          
+          status = 1;
+        }
+        else
+          status = 0;
+        
+        return status;
+      }
+    ]]>
+  </fx:Script>
+  <my:states>
+
+    <s:State name="Ipad_portait" />
+    <s:State name="Ipad_landscape" />
+    <s:State name="Desire_portrait" />
+    <s:State name="Desire_landscape" />
+    <s:State name="Iphone_portrait" />
+    <s:State name="Iphone_landscape" />
+  </my:states>
+
+
+  <fx:Declarations>
+    <!-- Place non-visual elements (e.g., services, value objects) here -->
+    <s:RadioButtonGroup id="SubType" change="{dispatchEvent(new Event('rbChange'))}"/>
+    <s:NumberValidator  source="{sez}" id="nv" allowNegative="false" domain="int" property="text" enabled="{sez.enabled}" maxValue="500" trigger="{go}" triggerEvent="{MouseEvent.MOUSE_DOWN}" 
+                        greaterThanMaxError="{resourceManager.getString('resources','GREATER_THAN_MAX_ERROR')}" invalidCharError="{resourceManager.getString('resources','INVALID_CHAR_ERROR')}" 
+                        requiredFieldError="{resourceManager.getString('resources','REQUIRED_FIELD_ERROR')}" />
+    <s:NumberValidator  source="{epiz}" id="nv1" allowNegative="false" domain="int" property="text" enabled="{epiz.enabled}" maxValue="500" trigger="{go}" triggerEvent="{MouseEvent.MOUSE_DOWN}"
+                        greaterThanMaxError="{resourceManager.getString('resources','GREATER_THAN_MAX_ERROR')}" invalidCharError="{resourceManager.getString('resources','INVALID_CHAR_ERROR')}" 
+                        requiredFieldError="{resourceManager.getString('resources','REQUIRED_FIELD_ERROR')}" />
+  </fx:Declarations>
+  <s:Label left="20" top="109" text="{resourceManager.getString('resources','MOVIE_TITLE')}"
+           left.Desire_landscape="20" top.Desire_landscape="19"
+           left.Desire_portrait="20" top.Desire_portrait="9"
+           left.Ipad_landscape="20" top.Ipad_landscape="109" fontSize.Ipad_landscape="24"
+           left.Ipad_portait="20" top.Ipad_portait="39" fontSize.Ipad_portait="24"
+           left.Iphone_landscape="20" top.Iphone_landscape="10"
+           left.Iphone_portrait="20" top.Iphone_portrait="10"/>
+  <s:TextInput id="MovName" left="25" top="133" enabled="{mov.selected || ser.selected}" 
+               left.Desire_landscape="25" top.Desire_landscape="43"
+               left.Desire_portrait="25" top.Desire_portrait="33"
+               left.Ipad_landscape="25" top.Ipad_landscape="133" fontSize.Ipad_landscape="24"
+               left.Ipad_portait="25" top.Ipad_portait="69" fontSize.Ipad_portait="24"
+               left.Iphone_landscape="25" top.Iphone_landscape="43"
+               left.Iphone_portrait="25" top.Iphone_portrait="43"/>
+  <s:Label left="20" top="210" text="{resourceManager.getString('resources','SEASON')}"
+           left.Desire_landscape="20" top.Desire_landscape="120"
+           left.Desire_portrait="20" top.Desire_portrait="110"
+           left.Ipad_landscape="20" top.Ipad_landscape="210" fontSize.Ipad_landscape="24"
+           left.Ipad_portait="20" top.Ipad_portait="146" fontSize.Ipad_portait="24"
+           left.Iphone_landscape="20" top.Iphone_landscape="121"
+           left.Iphone_portrait="20" top.Iphone_portrait="140"/>
+  <s:TextInput id="sez" left="25" top="234" enabled="{ser.selected}"
+               left.Desire_landscape="25" top.Desire_landscape="144"
+               left.Desire_portrait="25" top.Desire_portrait="134"
+               left.Ipad_landscape="25" top.Ipad_landscape="234" fontSize.Ipad_landscape="24"
+               left.Ipad_portait="25" top.Ipad_portait="175" fontSize.Ipad_portait="24"
+               left.Iphone_landscape="25" top.Iphone_landscape="154"
+               left.Iphone_portrait="25" top.Iphone_portrait="174"/>
+  <s:Label left="20" top="313" text="{resourceManager.getString('resources','EPISODE')}"
+           left.Desire_landscape="20" top.Desire_landscape="223"
+           left.Desire_portrait="20" top.Desire_portrait="213"
+           left.Ipad_landscape="20" top.Ipad_landscape="313" fontSize.Ipad_landscape="24"
+           left.Ipad_portait="20" top.Ipad_portait="254" fontSize.Ipad_portait="24"
+           left.Iphone_landscape="20" top.Iphone_landscape="253"
+           left.Iphone_portrait="20" top.Iphone_portrait="273"/>
+  <s:TextInput id="epiz" left="25" top="337" enabled="{ser.selected}"
+               left.Desire_landscape="25" top.Desire_landscape="247"
+               left.Desire_portrait="25" top.Desire_portrait="237"
+               left.Ipad_landscape="25" top.Ipad_landscape="337" fontSize.Ipad_landscape="24"
+               left.Ipad_portait="25" top.Ipad_portait="281" fontSize.Ipad_portait="24"
+               left.Iphone_landscape="25" top.Iphone_landscape="287"
+               left.Iphone_portrait="25" top.Iphone_portrait="307"/>
+  <s:VGroup left.Desire_landscape="500" top.Desire_landscape="47"
+            left.Desire_portrait="10" top.Desire_portrait="354"
+            left.Ipad_landscape="530" top.Ipad_landscape="485"
+            left.Ipad_portait="20" top.Ipad_portait="350"
+            left.Iphone_landscape="524" top.Iphone_landscape="166"
+            left.Iphone_portrait="197" top.Iphone_portrait="408">
+    <s:RadioButton id="mov" label="{resourceManager.getString('resources','MOVIE')}"
+                   groupName="SubType" selected="true"
+                   fontSize.Ipad_landscape="24"
+                   fontSize.Ipad_portait="24"/>
+    <s:RadioButton id="ser" label="{resourceManager.getString('resources','TV_SHOWS')}"
+                   groupName="SubType"
+                   fontSize.Ipad_landscape="24"
+                   fontSize.Ipad_portait="24"/>
+    <s:RadioButton id="no" label="{resourceManager.getString('resources','DEFAULT')}"
+                   groupName="SubType"
+                   fontSize.Ipad_landscape="24"
+                   fontSize.Ipad_portait="24"/>
+  </s:VGroup>
+  <s:Button id="go" width="150" label="{getLabel()}" click="go_clickHandler(event)"
+            left.Desire_landscape="473" top.Desire_landscape="247"
+            left.Desire_portrait="308" top.Desire_portrait="324"
+            left.Ipad_landscape="530" top.Ipad_landscape="185"
+            left.Ipad_portait="20" top.Ipad_portait="560"
+            left.Iphone_landscape="498" top.Iphone_landscape="93"
+            left.Iphone_portrait="20" top.Iphone_portrait="427"/>
+  <s:Button width="150" label="{resourceManager.getString('resources','BACK_BTN')}"
+            click="{navigator.popView()}"
+            left.Desire_landscape="640" top.Desire_landscape="247"
+            left.Desire_portrait="308" top.Desire_portrait="415"
+            left.Ipad_landscape="530" top.Ipad_landscape="300"
+            left.Ipad_portait="22" top.Ipad_portait="680"
+            left.Iphone_landscape="498" top.Iphone_landscape="13"
+            left.Iphone_portrait="318" top.Iphone_portrait="425"/>
+  <s:Label left="25" top="185" color="#9C2626" fontSize="16" text="{sez.errorString}"
+           left.Desire_landscape="25" top.Desire_landscape="196"
+           left.Ipad_landscape="25" top.Ipad_landscape="185"
+           left.Ipad_portait="25" top.Ipad_portait="121"
+           left.Iphone_landscape="25" top.Iphone_landscape="225"
+           left.Iphone_portrait="25" top.Iphone_portrait="244"/>
+  <s:Label left="25" top="291" color="#9C2626" fontSize="16" text="{epiz.errorString}"
+           left.Desire_landscape="25" top.Desire_landscape="299"
+           left.Ipad_landscape="25" top.Ipad_landscape="291"
+           left.Ipad_portait="25" top.Ipad_portait="232"
+           left.Iphone_landscape="25" top.Iphone_landscape="361"
+           left.Iphone_portrait="25" top.Iphone_portrait="378"/>
+  <s:CheckBox id="cb" label="{resourceManager.getString('resources','PLAY_WITH_MPC')}" visible="{appModel.mpc_on}"
+              left.Desire_landscape="27" top.Desire_landscape="321"
+              left.Desire_portrait="10" top.Desire_portrait="561"
+              left.Ipad_landscape="50" top.Ipad_landscape="543" fontSize.Ipad_landscape="24"
+              left.Ipad_portait="20" top.Ipad_portait="510" fontSize.Ipad_portait="24"
+              left.Iphone_landscape="506" top.Iphone_landscape="331"
+              left.Iphone_portrait="30" top.Iphone_portrait="560"/>
+</my:OrientationView>
+<!--========================================================smeti===================================================================================
+<s:Label left="20" top="10" text="{data.nativePath}" width="100%"/>
+<s:Label left="20" top="109" text="Title"
+left.landscape="20" top.landscape="59"/>
+<s:TextInput left="25" top="133" enabled="{mov.selected || ser.selected}"
+left.landscape="25" top.landscape="83"/>
+<s:Label left="20" top="210" text="Season"
+left.landscape="20" top.landscape="160"/>
+<s:TextInput left="25" top="234" enabled="{ser.selected}" id="sez"
+left.landscape="25" top.landscape="184"/>
+<s:Label left="20" top="313" text="Episode"
+left.landscape="20" top.landscape="263"/>
+<s:TextInput left="25" top="337" enabled="{ser.selected}" id="epiz"
+left.landscape="25" top.landscape="287"/>
+<s:VGroup left.landscape="500" top.landscape="87"
+left.portrait="10" top.portrait="454">
+<s:RadioButton id="mov" label="Movie" groupName="SubType" selected="true"/>
+<s:RadioButton id="ser" label="Series" groupName="SubType"/>
+<s:RadioButton id="no" label="No or default subs" groupName="SubType"/>
+</s:VGroup>
+<s:Button width="150" label="{getLabel()}" id="go"
+left.landscape="473" top.landscape="287"
+left.portrait="308" top.portrait="454"/>
+<s:Button width="150" label="Back" click="{navigator.popView()}"
+left.landscape="640" top.landscape="287"
+left.portrait="308" top.portrait="545"/>
+
+
+
+
+
+<s:Form width="100%" height="100%" >
+<s:layout>
+<s:VerticalLayout/>
+</s:layout>
+<s:FormItem  width="100%" required="{!no.selected}" skinClass="slike.itemStackedSkin">
+<s:layout>
+<s:BasicLayout/>
+</s:layout>
+<s:Label  text="{data.nativePath}" width="100%"/>
+<s:Label  text="Title"
+y="80"/>
+<s:TextInput enabled="{!no.selected}"
+y="104"/>
+</s:FormItem>
+<s:FormItem  width="100%" required="{ser.selected}" label="Season" skinClass="slike.itemStackedSkin">
+<s:TextInput enabled="{ser.selected}" id="sez"/>
+</s:FormItem>
+<s:FormItem  width="100%" required="{ser.selected}" label="Episode" skinClass="slike.itemStackedSkin">
+<s:TextInput enabled="{ser.selected}" id="epiz"/>
+</s:FormItem>
+<s:FormItem  width="100%">
+<s:layout>
+<s:HorizontalLayout/>
+</s:layout>
+<s:VGroup>
+<s:Button id="go" width="150" label="{getLabel()}"
+x.portrait="-5" y.portrait="-5"/>
+<s:Button width="150" label="Back" click="{navigator.popView()}"
+x.portrait="171" y.portrait="-5"/>
+</s:VGroup>
+<s:VGroup >
+<s:RadioButton id="mov" label="Movie" groupName="SubType" selected="true"/>
+<s:RadioButton id="ser" label="Series" groupName="SubType"/>
+<s:RadioButton id="no" label="No or default subs" groupName="SubType"/>
+</s:VGroup>
+</s:FormItem>
+
+</s:Form>
+-->

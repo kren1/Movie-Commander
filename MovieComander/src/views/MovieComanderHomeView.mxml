@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+                 xmlns:s="library://ns.adobe.com/flex/spark" title="{appModel.currentDir}" backgroundColor="0x6666666" viewDeactivate="saveScrollPosition()" viewActivate="restoreScrollPosition()" >
+  <fx:Script>
+    <![CDATA[
+      import model.AppModel;
+      
+      import mx.core.FlexGlobals;
+      import mx.events.FlexEvent;
+      
+      import other.ComCommands;
+      
+      import slike.dirUP;
+      
+      import spark.events.IndexChangeEvent;
+      import spark.layouts.VerticalLayout;
+      
+      [Bindable]
+      private var appModel:AppModel = AppModel.getInstance();
+      
+      private  var ba:ByteArray = new ByteArray();
+      protected final function list1_changeHandler(event:IndexChangeEvent):void
+      {
+        event.stopPropagation();
+        if(event.target.selectedItems[0].dir == true)
+        {
+          ba.clear();
+          if(event.target.selectedItems[0].name == "VIDEO_TS")
+          {
+            ba.writeByte(ComCommands.PLAY_DVD);
+            navigator.pushView(DvdControl);
+          }
+          else
+            ba.writeByte(ComCommands.NAVIGATE); 
+          
+          ba.writeObject(event.target.selectedItems[0]);
+          appModel.Send(ba);
+          appModel.ShowBusy();
+        }
+        else if(event.target.selectedItems[0].dir == false)
+        {
+          if(event.target.selectedItems[0].end == "nfo" || event.target.selectedItems[0].end == "txt")
+          {
+            ba.clear();
+            ba.writeByte(ComCommands.GET_TXT);
+            ba.writeObject(event.target.selectedItems[0]);
+            appModel.Send(ba);
+            appModel.NfoName = event.target.selectedItems[0].name;
+          }
+          else
+            navigator.pushView(SubSelector,event.target.selectedItems[0]);
+        }
+        
+         
+      }
+      
+      protected final function button1_clickHandler(event:MouseEvent):void
+      {
+        event.stopPropagation();
+        appModel.ShowBusy();
+        ba.clear();
+        ba.writeByte(ComCommands.DIR_BACK);
+        appModel.Send(ba);
+      }
+      private function restoreScrollPosition():void 
+      {
+        // the data might be null if it has never been set
+        if (appModel.scrolPos.verticalScrollPosition == null)return;
+
+      //  if(data.dir != appModel.currentDir)return;
+        
+        var restoredVSP:Number = appModel.scrolPos.verticalScrollPosition as Number;
+      //  var restoredHSP:Number = data.horizontalScrollPosition as Number;
+        
+        var maxVSP:Number = Math.abs(myList.dataGroup.contentHeight - myList.dataGroup.height);
+      //  var maxHSP:Number = myList.dataGroup.contentWidth - myList.dataGroup.width;
+        
+        // restore the saved scroll position, but don't set it to higher than the maximum
+        // to prevent from orientation changes causing a scroll into excess space
+        myList.dataGroup.verticalScrollPosition = Math.min(maxVSP, restoredVSP);
+     //   myList.dataGroup.horizontalScrollPosition = Math.min(maxHSP, restoredHSP);
+      } 
+      private function saveScrollPosition():void 
+      {
+        // first time the data might not be created yet
+     /*   if (data == null)
+          data = new Object();*/
+        
+        // save the vertical scroll position
+       appModel.scrolPos.verticalScrollPosition = myList.dataGroup.verticalScrollPosition;
+      //  data.horizontalScrollPosition = myList.dataGroup.horizontalScrollPosition;
+      //  data.dir = appModel.currentDir;
+      }
+      private function itemClickInfo(event:MouseEvent):void
+      {
+        var ba:ByteArray = new ByteArray();
+        switch (event.currentTarget.id) 
+        { 
+          case "pause": 
+            ba.writeByte(ComCommands.PAUSE_MOVIE); 
+            break; 
+          case "close": 
+            ba.writeByte(ComCommands.CLOSE_PLAYER);
+            break; 
+          case "opt":navigator.pushView(Options);break;
+          case "nowPlaying":navigator.pushView(MoviePlaying);break;
+          case "dvd":navigator.pushView(DvdControl);break;
+          case "sd":ba.writeByte(ComCommands.SHUTDOWN);break;
+          default : 
+            ba.clear(); 
+        }               
+        appModel.Send(ba);
+      }
+      
+    ]]>
+  </fx:Script>
+  <fx:Declarations>
+    <!-- Place non-visual elements (e.g., services, value objects) here -->
+  </fx:Declarations>
+  <s:viewMenuItems>
+    <s:ViewMenuItem id="close" label="{resourceManager.getString('resources','CLOSE')}" click="itemClickInfo(event);"/>
+    <s:ViewMenuItem id="pause" label="{resourceManager.getString('resources','PAUSE')}" click="itemClickInfo(event);"/>
+    <s:ViewMenuItem id="opt" label="{resourceManager.getString('resources','OPTIONS')}" click="itemClickInfo(event);"/> 
+    <s:ViewMenuItem id="nowPlaying" label="{resourceManager.getString('resources','NOW_PLAYING')}" click="itemClickInfo(event);"/> 
+    <s:ViewMenuItem id="dvd" label="DVD" click="itemClickInfo(event);"/> 
+    <s:ViewMenuItem id="sd" label="Shutdown" click="itemClickInfo(event);"/> 
+  </s:viewMenuItems>
+  
+  <s:navigationContent>
+    <s:Button label="Menu" click="{FlexGlobals.topLevelApplication.viewMenuOpen = !FlexGlobals.topLevelApplication.viewMenuOpen}" id="menu"/>
+  </s:navigationContent>
+  <s:actionContent>
+    <s:Button icon="{slike.dirUP}" click="button1_clickHandler(event)" />
+  </s:actionContent>
+  <s:List width="100%" height="100%" dataProvider="{appModel.FileList}" id="myList"
+          itemRenderer="renderers.FileRenderer" change="list1_changeHandler(event)" contentBackgroundAlpha="0" alternatingItemColors="[0x999999,0xAAAAAA]"/>
+</s:View>

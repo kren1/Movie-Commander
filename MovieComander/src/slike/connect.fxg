@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Graphic version="2.0" viewHeight="60" viewWidth="80" ai:appVersion="15.0.0.399" ATE:version="1.0.0" flm:version="1.0.0" d:id="1" d:using="" xmlns="http://ns.adobe.com/fxg/2008" xmlns:ATE="http://ns.adobe.com/ate/2009" xmlns:ai="http://ns.adobe.com/ai/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt" xmlns:flm="http://ns.adobe.com/flame/2008">
+  <Library/>
+  <Group ai:artboardActive="1" ai:artboardIndex="0" ai:seqID="1" d:layerType="page" d:pageHeight="60" d:pageWidth="80" d:type="layer" d:userLabel="Artboard 1">
+    <Group ai:objID="16226a00" ai:seqID="2" d:id="2" d:type="layer" d:userLabel="Layer 2">
+      <Path x="15.5566" y="22.1611" winding="nonZero" ai:objID="16976180" ai:seqID="3" data="M1.14014 28.5322 0 8.82861 2.62305 5.77588 8.11914 0 31.333 22.0967 25.7871 27.8887">
+        <stroke>
+          <SolidColorStroke weight="5" caps="none" joints="miter" miterLimit="10" color="#FFFFFF"/>
+        </stroke>
+      </Path>
+      <Path x="36.1753" winding="nonZero" ai:objID="16973300" ai:seqID="4" data="M5.0874 8.08105 0 13.7383 19.6567 33.876 24.811 28.0786 5.0874 8.08105 8.78564 4.10938 26.0435 6.43701 32.3433 0">
+        <stroke>
+          <SolidColorStroke weight="5" caps="none" joints="miter" miterLimit="10" color="#FFFFFF"/>
+        </stroke>
+      </Path>
+      <Line xFrom="29.8916" yFrom="28.0786" xTo="37.0171" yTo="21.5039" ai:objID="1697b400" ai:seqID="5">
+        <stroke>
+          <SolidColorStroke weight="5" caps="none" joints="miter" miterLimit="10" color="#FFFFFF"/>
+        </stroke>
+      </Line>
+      <Line xFrom="40.355" yFrom="38.0381" xTo="46.8896" yTo="31.9131" ai:objID="1697c480" ai:seqID="6">
+        <stroke>
+          <SolidColorStroke weight="5" caps="none" joints="miter" miterLimit="10" color="#FFFFFF"/>
+        </stroke>
+      </Line>
+      <Path x="10.5825" y="27.937" winding="nonZero" ai:objID="16975a00" ai:seqID="7" data="M0 31.5063 6.16357 22.7407 26.9673 23.9458 30.8101 22.0972 7.59717 0">
+        <stroke>
+          <SolidColorStroke weight="5" caps="none" joints="miter" miterLimit="10" color="#FFFFFF"/>
+        </stroke>
+      </Path>
+      <Path x="61.625" y="6.47754" winding="nonZero" ai:objID="1c880d00" ai:seqID="8" data="M1.33887 0 4.1748 15.3442 0 20.9189">
+        <stroke>
+          <SolidColorStroke weight="5" caps="none" joints="miter" miterLimit="10" color="#FFFFFF"/>
+        </stroke>
+      </Path>
+    </Group>
+  </Group>
+  <Private>
+      <ai:PrivateElement d:ref="#1">
+        <ai:SaveOptions>
+          <ai:Dict data="B includeObjectOutsideArtboard 0 I expandBlendsOption 5 I rasterizeResolution 72 B downsampleLinkedImages 0 I preserveTextPolicy 4 I preserveFilterPolicy 3 I preserveGradientPolicy 4 I versionKey 2 B includeSymbol 0 B aiEditCap 1 B writeImages 1 B includeXMP 0 "/>
+        </ai:SaveOptions>
+        <ai:DocData base="connect.assets/images" rulerCanvasDiffH="40.5" rulerCanvasDiffV="30.5">
+          <ai:DocRasterSettings>
+            <ai:Dict data="R padd 36 B spot 0 B mask 0 I colr 4 B alis 0 I dpi. 72 "/>
+          </ai:DocRasterSettings>
+        </ai:DocData>
+        <ai:AutoGenImageList>
+          <ai:Dict/>
+        </ai:AutoGenImageList>
+      </ai:PrivateElement>
+      <ai:PrivateElement flm:hashcode="B79B26BC38599D4465C201AF0E7FFB2A" d:ref="#2">
+        <ai:LayerOptions color="5 257 79.31 79.31"/>
+      </ai:PrivateElement>
+    </Private>
+  </Graphic>

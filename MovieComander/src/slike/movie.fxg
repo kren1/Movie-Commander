@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Graphic version="2.0" viewHeight="40" viewWidth="43" ai:appVersion="15.0.0.399" ATE:version="1.0.0" flm:version="1.0.0" d:id="1" d:using="" xmlns="http://ns.adobe.com/fxg/2008" xmlns:ATE="http://ns.adobe.com/ate/2009" xmlns:ai="http://ns.adobe.com/ai/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt" xmlns:flm="http://ns.adobe.com/flame/2008">
+  <Library/>
+  <Group ai:artboardActive="1" ai:artboardIndex="0" ai:seqID="1" d:layerType="page" d:pageHeight="40" d:pageWidth="43" d:type="layer" d:userLabel="Artboard 1">
+    <Group ai:objID="d4fed00" ai:seqID="2" d:id="2" d:locked="true" d:type="layer" d:userLabel="Layer 1">
+      <Rect y="2.5" width="43" height="35" ai:objID="ddeae80" ai:seqID="3">
+        <fill>
+          <SolidColor color="#333333"/>
+        </fill>
+      </Rect>
+    </Group>
+    <Group ai:objID="dd01880" ai:seqID="4" d:id="3" d:type="layer" d:userLabel="Layer 2">
+      <Path x="10.9976" y="10.457" winding="nonZero" ai:objID="d9f7180" ai:seqID="5" data="M19.0034 9.04297 0.00585938 18 0 0 19.0034 9.04297 19.0034 9.04297Z">
+        <fill>
+          <SolidColor color="#F2F2F2"/>
+        </fill>
+      </Path>
+    </Group>
+  </Group>
+  <Private>
+      <ai:PrivateElement d:ref="#1">
+        <ai:SaveOptions>
+          <ai:Dict data="B includeObjectOutsideArtboard 0 I preserveTextPolicy 4 I preserveFilterPolicy 3 I expandBlendsOption 5 B downsampleLinkedImages 0 I rasterizeResolution 72 I preserveGradientPolicy 4 I versionKey 2 B writeImages 1 B includeXMP 0 B aiEditCap 1 B includeSymbol 0 "/>
+        </ai:SaveOptions>
+        <ai:DocData base="movie.assets/images" globalOffsetH="4" globalOffsetV="0.5" rulerCanvasDiffH="26.5" rulerCanvasDiffV="20.5">
+          <ai:DocRasterSettings>
+            <ai:Dict data="B mask 0 R padd 36 B spot 0 B alis 0 I dpi. 72 I colr 4 "/>
+          </ai:DocRasterSettings>
+        </ai:DocData>
+        <ai:AutoGenImageList>
+          <ai:Dict/>
+        </ai:AutoGenImageList>
+      </ai:PrivateElement>
+      <ai:PrivateElement flm:hashcode="A4372D68131493995670BDBCFEB79A70" d:ref="#2">
+        <ai:LayerOptions color="5 79.31 257 128.502" locked="1"/>
+      </ai:PrivateElement>
+      <ai:PrivateElement flm:hashcode="C15681866AD8DAD047B28CBDF93484B1" d:ref="#3">
+        <ai:LayerOptions color="5 257 79.31 79.31"/>
+      </ai:PrivateElement>
+    </Private>
+  </Graphic>

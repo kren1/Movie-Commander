@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:s="library://ns.adobe.com/flex/spark"
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   creationComplete="windowedapplication1_creationCompleteHandler(event)" close="windowedapplication1_closeHandler(event)">
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center"/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+      import com.cartoonsmart.Events.OptionsWindowEvent;
+      import com.cartoonsmart.Events.SubtitleCompleteEvent;
+      import com.cartoonsmart.Events.SubtitleEvent;
+      import com.cartoonsmart.dto.Player_dto;
+      import com.cartoonsmart.other.ConfiHandler;
+      import com.cartoonsmart.other.MovieComunicator;
+      import com.cartoonsmart.other.NativeAppsHandler;
+      import com.cartoonsmart.other.Options;
+      import com.cartoonsmart.subtitles.SubTitleListPopUp;
+      import com.cartoonsmart.subtitles.SubtitleSelector;
+      import com.cartoonsmart.subtitles.Subtitles;
+      import com.cartoonsmart.subtitles.SubtitlesListrenderer;
+      
+      import mx.core.IFlexDisplayObject;
+      import mx.events.FileEvent;
+      import mx.events.FlexEvent;
+      import mx.managers.PopUpManager;
+      
+      import spark.components.List;
+      import spark.events.IndexChangeEvent;
+			
+			
+			private var OptionsWindow:Options;
+			private var confi:ConfiHandler = new ConfiHandler();
+			private var VLC_Path:String = "";
+			private var MPC_Path:String = "";
+			public var mpcState:Player_dto = new Player_dto();
+			private var AppHandler:NativeAppsHandler = new NativeAppsHandler();
+      private var subs:Boolean;
+      [Bindable]
+      private var my_ip:String = "";
+      
+      private var subCenter:Subtitles = new Subtitles(this as DisplayObject);
+      
+      private var movieCom:MovieComunicator; 
+			
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{				
+				var root:NativeMenu = new NativeMenu();
+					var file:NativeMenu = new NativeMenu();
+						var Options:NativeMenuItem = new NativeMenuItem();
+						var Up:NativeMenuItem = new NativeMenuItem();
+					var tools:NativeMenu = new NativeMenu();
+						var close:NativeMenuItem = new NativeMenuItem();
+						var pause:NativeMenuItem = new NativeMenuItem();
+				root.addSubmenu(file,"File");
+				root.addSubmenu(tools, "Tools")
+				file.addItem(Options);
+				file.addItem(Up);
+				tools.addItem(close);
+				tools.addItem(pause);
+				nativeWindow.menu = root;
+				Options.addEventListener(Event.SELECT,ShowOptions);
+				Up.addEventListener(Event.SELECT,function():void{if(FileList.canNavigateUp)FileList.navigateUp();});
+				close.addEventListener(Event.SELECT,function():void{AppHandler.ExecuteKeyboardCommand(NativeAppsHandler.CLOSE_PLAYER,mpcState.PlayerString);});
+				pause.addEventListener(Event.SELECT,function():void{AppHandler.ExecuteKeyboardCommand(NativeAppsHandler.PAUSE_MOVIE,mpcState.PlayerString);});
+				Options.label = "Options";
+				Up.label = "Directory up";
+				close.label = "Close";
+				pause.label = "Pause";
+				/*nativeWindow.height = Screen.mainScreen.bounds.height;
+				nativeWindow.width = 400;
+				nativeWindow.x = Screen.mainScreen.bounds.width - nativeWindow.width;
+				nativeWindow.y = 0;*/
+				
+				VLC_Path = confi.Read("VLC_Path");
+				MPC_Path = confi.Read("MPC_Path");
+        var st:String = confi.Read("SubsON")
+        subs = Boolean(st);
+				FileList.directory = File.desktopDirectory.resolvePath(confi.Read("defaultPath"));
+
+        subCenter.addEventListener(SubtitleEvent.SUB_LIST_COMPLETE,SubListProcessing);
+        subCenter.addEventListener(SubtitleCompleteEvent.SUB_COMPLETE,runWithSub);
+        
+        movieCom = new MovieComunicator(subCenter,FileList,mpcState);
+        my_ip = MovieComunicator.getLocalIp();
+        movieCom.InitateSeqence();
+			}
+			private function ShowOptions(e:Event):void
+			{
+				OptionsWindow = new Options();
+        PopUpManager.addPopUp(OptionsWindow,this);
+        PopUpManager.centerPopUp(OptionsWindow);
+				OptionsWindow.vlc_path.text = VLC_Path;
+				OptionsWindow.mpc_path.text = MPC_Path;
+				OptionsWindow.mpcCB.selected = mpcState.PlayerBool;
+        OptionsWindow.SubsCb.selected = !subs;
+				OptionsWindow.addEventListener(OptionsWindowEvent.WINDOW_CLOSED, SaveOptions);
+			}
+			private function SaveOptions(e:OptionsWindowEvent):void
+			{
+        OptionsWindow.removeEventListener(OptionsWindowEvent.WINDOW_CLOSED, SaveOptions);
+				VLC_Path = e.VLCPath
+				MPC_Path = e.MPCPath;
+				mpcState = e.player;
+        subs = !e.subs;
+				confi.Write("VLC_Path",VLC_Path);
+				confi.Write("MPC_Path",MPC_Path);
+        if(subs == true)confi.Write("SubsON",String(subs));
+        else confi.Write("SubsON","");
+				confi.Save();
+			}
+			protected function FileList_fileChooseHandler(event:FileEvent):void
+			{
+        if(movieCom.socket.connected == true)
+        {
+          if(mpcState.PlayerString == NativeAppsHandler.VLC_PLAYER)
+           movieCom.nativeHandler.runPlayer(File.desktopDirectory.resolvePath(VLC_Path),[event.file.nativePath,"--fullscreen"],true);
+          else
+           movieCom.nativeHandler.runPlayer(File.desktopDirectory.resolvePath(MPC_Path),[event.file.nativePath,"/fullscreen"],false);
+          return;
+        }
+        if(!subs)
+        {
+          if(mpcState.PlayerString == NativeAppsHandler.VLC_PLAYER)
+           movieCom.nativeHandler.runPlayer(File.desktopDirectory.resolvePath(VLC_Path),[event.file.nativePath,"--fullscreen"],true);
+          else
+           movieCom.nativeHandler.runPlayer(File.desktopDirectory.resolvePath(MPC_Path),[event.file.nativePath,"/fullscreen"],false);
+        }
+        else
+        {
+          subCenter.StartSequence(event.file.nativePath);
+        }
+
+				
+			}
+      private function SubListProcessing(e:SubtitleEvent):void
+      {
+        var list:SubTitleListPopUp = new SubTitleListPopUp();
+        list.dp = e.ac;
+        
+        PopUpManager.addPopUp(list,this);
+        PopUpManager.centerPopUp(list);
+        
+        list.list.addEventListener(IndexChangeEvent.CHANGE,function(e:IndexChangeEvent):void
+        {
+          subCenter.DownloadSub(e.currentTarget.selectedItems[0].id,e.currentTarget.selectedItems[0].chrSet);
+          PopUpManager.removePopUp(list);
+        },false,0,true);
+      }
+			protected function windowedapplication1_closeHandler(event:Event):void
+			{
+				// TODO Auto-generated method stub
+				confi.Write("defaultPath",FileList.directory.nativePath);
+				confi.Save();
+			}
+      private function runWithSub(event:SubtitleCompleteEvent):void
+      {
+        if(mpcState.PlayerString == NativeAppsHandler.VLC_PLAYER)
+         movieCom.nativeHandler.runPlayer(File.desktopDirectory.resolvePath(VLC_Path),[event.movieFile,"--fullscreen","--sub-file="+event.subtitleFile.nativePath],true);
+        else
+         movieCom.nativeHandler.runPlayer(File.desktopDirectory.resolvePath(MPC_Path),[event.movieFile,"/fullscreen","/sub",event.subtitleFile.nativePath],false);
+        
+      }
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+
+	<s:VGroup height="100%" width="100%" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" horizontalAlign="center">
+		<mx:FileSystemList width="100%" height="80%" id="FileList" fileChoose="FileList_fileChooseHandler(event)"/>
+		<s:Label id="IpLabel" fontSize="60" text="{my_ip}"/>
+	</s:VGroup>
+</s:WindowedApplication>

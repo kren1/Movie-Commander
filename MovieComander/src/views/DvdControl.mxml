@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+        xmlns:s="library://ns.adobe.com/flex/spark" title="{resourceManager.getString('resources','TITLE')}" backgroundColor="0x6666666">
+  
+  <fx:Script>
+    <![CDATA[
+      import model.AppModel;
+      
+      import other.ComCommands;
+      
+      import slike.close;
+      
+      [Bindable]
+      private var appModel:AppModel = AppModel.getInstance();
+      
+      protected final function button1_clickHandler(event:MouseEvent):void
+      {
+        event.stopPropagation();
+        var ba:ByteArray = new ByteArray();
+        switch(event.currentTarget.id)
+        {
+          case "up": ba.writeByte(ComCommands.UP);break;
+          case "left": ba.writeByte(ComCommands.LEFT);break;
+          case "right": ba.writeByte(ComCommands.RIGHT);break;
+          case "down": ba.writeByte(ComCommands.DOWN);break;
+          case "select": ba.writeByte(ComCommands.ENTER);break;
+        }
+        appModel.Send(ba);
+        
+      }
+    ]]>
+  </fx:Script>
+  
+  <fx:Declarations>
+    <!-- Place non-visual elements (e.g., services, value objects) here -->
+  </fx:Declarations>
+  <s:actionContent>
+    <s:Button icon="{slike.close}" click="{navigator.popView()}"/>
+  </s:actionContent>
+  <s:Button width="135" id="up" label="{resourceManager.getString('resources','UP')}" horizontalCenter="0" verticalCenter="-100"   click="button1_clickHandler(event)"/>
+  <s:Button width="135" id="left" label="{resourceManager.getString('resources','LEFT')}" horizontalCenter="-155" verticalCenter="0" click="button1_clickHandler(event)"/>
+  <s:Button width="135" id="right" label="{resourceManager.getString('resources','RIGHT')}" horizontalCenter="155" verticalCenter="0" click="button1_clickHandler(event)"/>
+  <s:Button width="135" id="down" label="{resourceManager.getString('resources','DOWN')}" horizontalCenter="0" verticalCenter="100"  click="button1_clickHandler(event)"/>
+  <s:Button width="135" id="select" label="{resourceManager.getString('resources','SELECT')}" horizontalCenter="0" verticalCenter="0"  click="button1_clickHandler(event)"/>
+</s:View>

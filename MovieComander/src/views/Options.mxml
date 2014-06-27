@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+                 xmlns:s="library://ns.adobe.com/flex/spark" backgroundColor="0x6666666" initialize="view1_initializeHandler()" xmlns:other="com.cartoonsmart.other.*" viewActivate="view1_viewActivateHandler(event)" >
+  <fx:Script>
+    <![CDATA[
+      import com.cartoonsmart.other.ConfiHandler;
+      
+      import model.AppModel;
+      
+      import mx.collections.ArrayCollection;
+      
+      import slike.connect;
+      import slike.save;
+      
+      import spark.events.IndexChangeEvent;
+      import spark.events.ViewNavigatorEvent;
+      import spark.layouts.ConstraintLayout;
+      import spark.layouts.supportClasses.LayoutBase;
+      
+      [Bindable]
+      private var appModel:AppModel = AppModel.getInstance();
+      
+      private var confi:ConfiHandler = new ConfiHandler();
+      
+      [Bindable]
+      private var locales:ArrayCollection = new ArrayCollection([
+        {label:"English", locale:"en_US"},
+        {label:"German", locale:"de_DE"},
+     /*   {label:"French (France)", locale:"fr_FR"},*/
+        {label:"Slovenščina", locale:"sl_SI"}]);
+
+      protected final function view1_initializeHandler():void
+      {
+        // TODO Auto-generated method stub
+        var n:int = 0;
+        if(confi.Read("Welcome") == "1.0")
+        {
+          var a:Array = confi.Read("Langs").split(";");
+          if(confi.Read("Ip") != "")
+            ip.text = confi.Read("Ip");
+          for(var i:String in appModel.LangsSupported)
+          {
+            appModel.LangsSupported[i].Status = Boolean(int(a[n++])); 
+          }
+        }
+        else
+        {
+          navigator.pushView(Intro,{title:resourceManager.getString('resources','WELCOME_TITLE'),text:resourceManager.getString('resources','WELCOME_TEXT'),lb:"toFit"});
+          confi.Write("Welcome","1.0")
+          confi.Save();
+        }
+        subLang.dol(true);
+        var s:String = confi.Read("Locale");
+        if(s != "" && s != null)
+          resourceManager.localeChain = [s];
+        else
+          resourceManager.localeChain = ["en_US"];
+      }	
+      protected final function Save():void
+      {
+        // TODO Auto-generated method stub
+        var s:String = "";
+        for(var i:String in appModel.LangsSupported)
+          s += String(int(appModel.LangsSupported[i].Status))+ ";";
+        
+        confi.Write("Langs",s);
+        confi.Write("Ip",ip.text);
+        confi.Write("Locale",resourceManager.localeChain[0]);
+        confi.Save();
+        
+        if(appModel.socket.connected)
+         navigator.pushView(MovieComanderHomeView);
+        
+      }
+      
+      protected final function one_clickHandler(event:MouseEvent):void
+      {
+        event.stopPropagation();
+        for(var s:String  in ab.navigationContent)
+        {
+          if(event.currentTarget != ab.navigationContent[s])
+          {
+            ab.navigationContent[s].dol(false);
+          }
+        }
+        switch(event.currentTarget.id)
+        {
+          case "subLang": this.currentState = "SubtitleLangs";break;
+          case "Lang": this.currentState = "Langs";break;
+          case "Mouse": this.currentState = "Mouse";break;
+        }
+      }
+      
+      protected final function list1_changeHandler(event:IndexChangeEvent):void
+      {
+        event.stopPropagation();
+        resourceManager.localeChain = [event.target.selectedItems[0].locale];
+      }
+      
+
+      
+      protected function view1_viewActivateHandler(event:ViewNavigatorEvent):void
+      {
+        titleLayout =  new ConstraintLayout();
+        actionContent = new Array();
+        if(!appModel.socket.connected)
+         actionContent.push(connect);
+        else
+          actionContent.push(save);
+      }
+      
+    ]]>
+  </fx:Script>
+  <s:states>
+    <s:State name="SubtitleLangs"/>
+    <s:State name="Langs"/>
+    <s:State name="Mouse"/>
+  </s:states>
+  <fx:Declarations>
+    <!-- Place non-visual elements (e.g., services, value objects) here -->
+    <s:Button  icon="{slike.connect}" width="90" click="{appModel.OpenSocket(ip.text,8000);Save();appModel.ShowBusy();}"  id="connect"/>
+    <s:Button  icon="{slike.save}" width="90" click="Save()" id="save"/>
+  </fx:Declarations>
+  <s:titleContent>
+    <s:TextInput id="ip" text="192.168.0.104" right="10" left="10" top="13"/>
+  </s:titleContent>
+
+  <s:List includeIn="Langs,SubtitleLangs" width="100%" top="0" bottom="{ab.height}"
+          alternatingItemColors="[0x999999,0xAAAAAA]" contentBackgroundAlpha="0"
+          dataProvider.SubtitleLangs="{appModel.LangsSupported}" itemRenderer.SubtitleLangs="renderers.cbRenderer"
+          dataProvider.Langs="{locales}" itemRenderer.Langs="spark.components.LabelItemRenderer" labelField.Langs="label" change.Langs="list1_changeHandler(event)"/>
+  <other:MousePad width="100%" top="0" bottom="{ab.height}" includeIn="Mouse" />
+
+  <s:ActionBar width="100%" bottom="0" id="ab">
+    <s:navigationContent>
+      <other:MyToogleButton label="{resourceManager.getString('resources','SUBTITLE_LANGUAGE')}" id="subLang" click="one_clickHandler(event)"/>
+      <other:MyToogleButton label="{resourceManager.getString('resources','MOUSE')}" id="Mouse" click="one_clickHandler(event)" visible="{appModel.mpc_on}"/>
+      <other:MyToogleButton label="{resourceManager.getString('resources','APPLICATION_LANGUAGE')}" id="Lang" click="one_clickHandler(event)"/>
+    </s:navigationContent>
+  </s:ActionBar>
+</s:View>

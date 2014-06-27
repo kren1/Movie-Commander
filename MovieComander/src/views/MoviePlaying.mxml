@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+        xmlns:s="library://ns.adobe.com/flex/spark" title="{resourceManager.getString('resources','MOVIE_PLAYING')}" backgroundColor="0x666666" viewDeactivate="view1_viewDeactivateHandler(event)" viewActivate="view1_viewActivateHandler(event)" xmlns:slike="slike.*">
+  <fx:Script>
+    <![CDATA[
+      import model.AppModel;
+      
+      import other.ComCommands;
+      
+      import slike.close;
+      import slike.movie;
+      
+      import spark.events.ViewNavigatorEvent;
+      [Bindable]
+      private var appModel:AppModel = AppModel.getInstance();
+      
+      private var time:Timer = new Timer(10000);
+      
+      private final function itemClickInfo(event:Object):void
+      {
+        var ba:ByteArray = new ByteArray();
+        
+        switch (event.currentTarget.id) 
+        { 
+          case "pause": 
+            ba.writeByte(ComCommands.PAUSE_MOVIE); 
+            break; 
+          case "close": 
+            ba.writeByte(ComCommands.CLOSE_PLAYER);
+            navigator.popView();
+            break; 
+          case "subm": 
+            ba.writeByte(ComCommands.SUB_MINUS);
+            break; 
+          case "subp": 
+            ba.writeByte(ComCommands.SUB_PLUS);
+            break; 
+          case "lb": 
+            ba.writeByte(ComCommands.LONG_BACKWARD);
+            break; 
+          case "mb": 
+            ba.writeByte(ComCommands.MEDIUM_BACKWARD);
+            break; 
+          case "sb": 
+            ba.writeByte(ComCommands.SHORT_BACKWARD);
+            break; 
+          case "lf": 
+            ba.writeByte(ComCommands.LONG_FORWARD);
+            break; 
+          case "mf": 
+            ba.writeByte(ComCommands.MEDIUM_FORWARD);
+            break; 
+          case "sf": 
+            ba.writeByte(ComCommands.SHORT_FORWARD);
+            break; 
+          default : 
+            ba.clear(); 
+        }               
+        appModel.Send(ba);
+      }
+      
+      protected final function view1_viewActivateHandler(event:ViewNavigatorEvent):void
+      {
+        time.addEventListener(TimerEvent.TIMER,ReqTime);
+        time.start();
+        event.stopPropagation();
+        if(data != null)
+        {
+          var status:int = -1;
+          var i:int = -1;
+          var a:Array
+          a = String(appModel.NowPlaying).split("\\");
+          var name:String = a[a.length-1]; 
+          a = [RegExp(/S\d\dE\d\d/i),RegExp(/\d\dx\d\d/),RegExp(/\dx\d\d/)];
+          var a1:Array = [{a:1,b:2,c:4,d:2},{a:0,b:2,c:3,d:2},{a:0,b:1,c:2,d:2}];
+          while(status != 1)
+          {
+            status = compare(a[i],a1[i]);
+            if(i+1 == a.length)break;   
+            i++;
+          }
+          if(status != 1)
+          {
+            i = String(name).search(/\d\d\d\d/);
+            if(i != -1)
+            {
+              var s:String = String(data.name).substring(0,i);
+              while(s.split(".").length != 1)
+                s = s.replace("."," ");
+              
+              this.title = s;
+            }
+          }
+        }
+        
+        
+      }
+      protected function ReqTime(e:TimerEvent):void
+      {
+        var ba:ByteArray = new ByteArray();
+        ba.writeByte(ComCommands.GET_TIME);
+        appModel.Send(ba);
+      }
+      private final function compare(r:RegExp,o:Object=null):int
+      {
+        var a:Array;
+        var status:int;
+        var e:String;
+        var sez:String;
+        var titile:String;
+        var s:String = "";
+        a =  String(appModel.NowPlaying).match(r);
+        if(a != null)
+        {
+          if(o != null)
+          {
+            sez = String(a[0]).substr(int(o.a),int(o.b));
+            e = String(a[0]).substr(int(o.c),int(o.d));  
+          }
+          a = String(appModel.NowPlaying).split("\\");
+          titile = a[a.length-1].substring(0,a[a.length-1].search(r));
+          while(titile.split(".").length != 1)
+            titile = titile.replace("."," ");
+          
+          
+          status = 1;
+        }
+        else
+          status = 0;
+        if(o != null)
+         s = " S:"+sez+" E:"+e;
+        
+        this.title =titile + s;
+        
+        return status;
+      }
+      protected function HSliderFunc(n:Number):Object
+      {
+        var sec:int = int(Math.floor(n));
+        var min:int = int(Math.floor(sec/60));
+        var hrs:int = int(Math.floor(sec/3600));
+        min = min - hrs*60;
+        sec = sec - min*60 - hrs*3600;
+        
+        return nf.format(hrs)+":"+nf.format(min)+":"+nf.format(sec);
+      }
+     
+      
+      protected function hslider1_changeHandler(event:Event):void
+      {
+       event.stopImmediatePropagation();
+       var ba:ByteArray = new ByteArray();
+       ba.writeByte(ComCommands.SEEK);
+       ba.writeInt(event.currentTarget.value);
+       appModel.Send(ba);
+       time.start();
+      }
+      
+      protected function view1_viewDeactivateHandler(event:ViewNavigatorEvent):void
+      {
+        time.removeEventListener(TimerEvent.TIMER,ReqTime);
+        time.stop();
+        event.stopPropagation();
+        
+      }
+      
+    ]]>
+  </fx:Script>
+  <s:states>
+    <s:State name="portrait"/>
+    <s:State name="landscape"/>
+  </s:states>
+  <fx:Declarations>
+    <!-- Place non-visual elements (e.g., services, value objects) here -->
+    <s:NumberFormatter  id="nf" fractionalDigits="0"/>
+  </fx:Declarations>
+  <s:actionContent>
+    <s:Button icon="{slike.close}" click="{navigator.popView()}"/>
+  </s:actionContent>
+  <slike:movie  left="10" right="10" top="10" bottom="440" bottom.landscape="210" right.landscape="320" horizontalCenter="0" />
+ <!-- <s:Button id="lb" bottom="170" width="160"
+            label="{resourceManager.getString('resources','LARGE_BACK')}"
+            click="itemClickInfo(event)"
+            right.landscape="215" bottom.landscape="200"
+            bottom.portrait="183" horizontalCenter.portrait="-95"/>
+  <s:Button id="mb" bottom="90" width="160"
+            label="{resourceManager.getString('resources','MEDIUM_BACK')}"
+            click="itemClickInfo(event)"
+            right.landscape="215" bottom.landscape="103"
+            bottom.portrait="90" horizontalCenter.portrait="-95"/>
+  <s:Button id="sb" bottom="10" width="160"
+            label="{resourceManager.getString('resources','SMALL_BACK')}"
+            click="itemClickInfo(event)"
+            right.landscape="215" bottom.landscape="10"
+            bottom.portrait="0" horizontalCenter.portrait="-95"/>
+  <s:Button id="lf" bottom="170" width="160"
+            label="{resourceManager.getString('resources','LARGE_FORW')}"
+            click="itemClickInfo(event)"
+            right.landscape="25" bottom.landscape="200"
+            bottom.portrait="183" horizontalCenter.portrait="95"/>
+  <s:Button id="mf" bottom="90" width="160"
+            label="{resourceManager.getString('resources','MEDIUM_FORW')}"
+            click="itemClickInfo(event)"
+            right.landscape="25" bottom.landscape="103"
+            bottom.portrait="90" horizontalCenter.portrait="95"/>
+  <s:Button id="sf" bottom="10" width="160"
+            label="{resourceManager.getString('resources','SMALL_FORW')}"
+            click="itemClickInfo(event)"
+            right.landscape="25" bottom.landscape="10"
+            bottom.portrait="0" horizontalCenter.portrait="95"/>-->
+
+  <s:Button id="close" bottom="410" width="160"
+            label="{resourceManager.getString('resources','CLOSE')}" click="itemClickInfo(event);"
+            horizontalCenter="75"
+            bottom.landscape="30" horizontalCenter.landscape="-95"
+            bottom.portrait="170" horizontalCenter.portrait="95"/>
+  <s:Button id="pause" bottom="410" width="160"
+            label="{resourceManager.getString('resources','PAUSE')}" click="itemClickInfo(event);"
+            horizontalCenter="-75"
+            bottom.landscape="30" horizontalCenter.landscape="-274"
+            bottom.portrait="170" horizontalCenter.portrait="-95"/>
+  <s:Button id="subm" bottom="330" width="160"
+            label="{resourceManager.getString('resources','SUB_MINUS')}"
+            click="itemClickInfo(event);" horizontalCenter="75"
+            bottom.landscape="30" horizontalCenter.landscape="273"
+            bottom.portrait="70" horizontalCenter.portrait="95"/>
+  <s:Button id="subp" bottom="330" width="160"
+            label="{resourceManager.getString('resources','SUB_PLUS')}"
+            click="itemClickInfo(event);" horizontalCenter="-75"
+            bottom.landscape="30" horizontalCenter.landscape="94"
+            bottom.portrait="70" horizontalCenter.portrait="-95"/>   
+  <s:HSlider left="5" right="5" bottom="122" maximum="{appModel.MovieLen}" minimum="0" dataTipFormatFunction="HSliderFunc" changeStart="{time.stop()}" 
+             changeEnd="hslider1_changeHandler(event)" value="{appModel.CurrentTime}"
+             left.portrait="5" right.portrait="5" bottom.portrait="290"/>
+ 
+</s:View>
+<!--======================================================================================SMETI===============================================
+<s:Label left="20" bottom="270" text="{resourceManager.getString('resources','JUMP_TO')}"/>
+<s:TextInput left="125" right="200" bottom="255" id="JumpTime"/>
+<s:Button right="10" bottom="245" width="120"
+label="{resourceManager.getString('resources','JUMP')}" click="button1_clickHandler(event)"/>
+<s:Label right="155" bottom="270" text="min"/>
+/* protected function button1_clickHandler(event:MouseEvent):void
+{
+var txt_num:Number = Number(JumpTime.text)
+var pet_min:int = int(Math.floor(txt_num/5));
+var dve_min:int = int(Math.floor((txt_num%5)/2))
+var dvajset_sec:int = int((txt_num - pet_min*5 - dve_min*2)*3)
+var i:int=0;
+var e:Object = new Object();
+e.currentTarget = new Object();
+trace("================================");
+for(i=0;i<pet_min;i++)
+{
+
+e.currentTarget.id = "lf";
+itemClickInfo(e);
+trace(e.currentTarget.id);
+}
+for(i=0;i<dve_min;i++)
+{
+
+e.currentTarget.id = "mf";
+itemClickInfo(e);
+trace(e.currentTarget.id);
+
+}
+for(i=0;i<dvajset_sec;i++)
+{
+
+e.currentTarget.id = "sf";
+itemClickInfo(e);
+trace(e.currentTarget.id);
+
+}
+
+}*/
+-->

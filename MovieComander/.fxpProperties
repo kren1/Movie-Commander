@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fxpProperties abbreviated="false" authoringTool="Flex Builder" compiles="true" parentProject="3de353d2-4e8a-4ee8-b780-eea67296dceb" projectUUID="3de353d2-4e8a-4ee8-b780-eea67296dceb" pureCatalystProject="false" sdkVersion="4.5.1" uuid="e33652e4-c02e-47f8-9bf0-660ebab4e6e9" version="15">
+  <projects/>
+  <src>
+    <linked isMain="false" location="${DOCUMENTS}/Movie/other" path="${DOCUMENTS}/Movie/other" position="0" uuid="e33652e4-c02e-47f8-9bf0-660ebab4e6e9"/>
+  </src>
+  <swc>
+    <linked location="sdkPlaceHolder" path="sdkPlaceHolder" position="0" uuid="e33652e4-c02e-47f8-9bf0-660ebab4e6e9"/>
+    <linked location="P:/software/MovieComander/libs" path="/libs" position="1" uuid="e33652e4-c02e-47f8-9bf0-660ebab4e6e9"/>
+  </swc>
+  <misc/>
+  <theme/>
+  <mxmlFormattingPrefs groupAttributesByState="true" maxLineWidth="100" mxmlAlignAttributes="true" mxmlAttributeOrder="id,userLabel,includeIn,excludeFrom,visible,x,y,z,left,right,top,bottom,width,height,minWidth,minHeight,maxWidth,maxHeight,label" mxmlKeepAttributeValuesOrganized="true"/>
+</fxpProperties>

@@ -1,0 +1,19 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@media (application-dpi: 160)
+{
+
+}
+@media (application-dpi: 240)
+{
+  
+}
+@media (application-dpi: 360)
+{
+  
+}
+s|TextInput
+{
+  skinClass:ClassReference("spark.skins.mobile.TextInputSkin");
+}
+

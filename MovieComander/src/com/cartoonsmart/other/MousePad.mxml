@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+        xmlns:s="library://ns.adobe.com/flex/spark"   backgroundColor="0x777777" mouseDown="view1_mouseDownHandler(event)" doubleClick="skinnablecontainer1_doubleClickHandler(event)" >
+  
+  <fx:Script>
+    <![CDATA[
+      import model.AppModel;
+      
+      import org.osmf.events.TimeEvent;
+      
+      import other.ComCommands;
+      private var ba:ByteArray = new ByteArray();
+      private var startPoint:Point;
+      private var currentPoint:Point;
+      private var t:Timer 
+      
+      [Bindable]
+      private var appModel:AppModel = AppModel.getInstance();
+      
+      protected final function view1_mouseDownHandler(event:MouseEvent):void
+      {
+        // TODO Auto-generated method stub
+        startPoint = new Point(event.localX,event.localY);
+        this.addEventListener(MouseEvent.MOUSE_MOVE,view1_mouseMoveHandler);
+        systemManager.addEventListener(MouseEvent.MOUSE_UP,kren);
+        if(t == null)
+          currentPoint = new Point(0,0);
+      }     
+      private final function kren(e:Event):void
+      {
+        this.removeEventListener(MouseEvent.MOUSE_MOVE,view1_mouseMoveHandler);
+        systemManager.removeEventListener(MouseEvent.MOUSE_UP,kren);
+       
+        t = new Timer(500,10);
+        t.addEventListener(TimerEvent.TIMER_COMPLETE,kren1);
+        t.start();
+        
+      }
+      private final function kren1(e:TimerEvent):void
+      {
+        if(t != null)
+        {
+          t.removeEventListener(TimerEvent.TIMER_COMPLETE,kren1);
+          t.stop();
+          t = null;
+        }
+
+       
+      }
+      protected function view1_mouseMoveHandler(event:MouseEvent):void
+      {
+        // TODO Auto-generated method stub
+        event.stopPropagation();
+        ba.clear();
+        var o:Object = new Object();
+        currentPoint.x += event.localX - startPoint.x;
+        currentPoint.y += event.localY - startPoint.y;
+        o.x = currentPoint.x;
+        o.y = currentPoint.y;
+        o.click = false;
+        ba.writeByte(ComCommands.MOUSE);
+        ba.writeObject(o);
+        appModel.Send(ba);
+        startPoint.x = event.localX;
+        startPoint.y = event.localY;
+      }
+      
+      protected function skinnablecontainer1_doubleClickHandler(event:MouseEvent):void
+      {
+        // TODO Auto-generated method stub
+        event.stopPropagation();
+        ba.clear();
+        var o:Object = new Object();;
+        o.x = currentPoint.x;
+        o.y = currentPoint.y;
+        o.click = true;
+        ba.writeByte(ComCommands.MOUSE);
+        ba.writeObject(o);
+        appModel.Send(ba);
+      }
+      
+    ]]>
+  </fx:Script>
+  
+  <fx:Declarations>
+    <!-- Place non-visual elements (e.g., services, value objects) here -->
+  </fx:Declarations>
+</s:SkinnableContainer>
